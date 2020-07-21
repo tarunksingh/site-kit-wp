@@ -98,6 +98,7 @@ class Health_Checks {
 	private function check_google_api() {
 		$client        = $this->authentication->get_oauth_client()->get_client();
 		$restore_defer = $client->withDefer( false );
+		$error_msg     = '';
 
 		// Make a request to the Search Console API.
 		// This request is bound to fail with a 401 "Login Required" error
@@ -111,11 +112,15 @@ class Health_Checks {
 			if ( $e->getCode() === 401 ) {
 				$pass = true;
 			} else {
-				$pass = false;
+				$pass      = false;
+				$error_msg = $e->getMessage();
 			}
 		}
 		$restore_defer();
 
-		return compact( 'pass' );
+		return array(
+			'pass'     => $pass,
+			'errorMsg' => $error_msg,
+		);
 	}
 }
